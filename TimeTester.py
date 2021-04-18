@@ -166,6 +166,3 @@ def plotACODataObjetos():
     plt.ylabel("Segundos")
     plt.plot(xpoints, ypoints)
     plt.show()
-
-plotACODataHormigas()
-plotACODataObjetos()
