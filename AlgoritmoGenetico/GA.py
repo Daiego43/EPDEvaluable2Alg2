@@ -5,15 +5,17 @@ objetivo es encontrar un reparto de los objetos entre los dos platillos de la ba
 entre los pesos de los objetos situados en cada platillo sea mínima.
 """
 import random as r
+import time as t
+import numpy as np
 
 
 class GeneticAlgorithm:
-    TAM_POBLACION = 10  # Tamaño elegido para la población
-    ELITE_PCT = 50      # Porcentaje de elitismo escogido 20%
-    NUM_OBJETOS = 10    # Numero de objetos a situar en los platillos de la balanza
+    TAM_POBLACION = 20  # Tamaño elegido para la población
+    ELITE_PCT = 50      # Porcentaje de elitismo escogido
+    NUM_OBJETOS = 10  # Numero de objetos a situar en los platillos de la balanza
     RANGO_PESOS = 100   # Rango maximo de peso de los objetos a colocar
     MUTATION_PCT = 10   # Probabilidad de aparicion de una mutacion tras realizar un cruce
-    NUM_ITER = 20       # Numero de iteraciones como condicion de parada
+    NUM_ITER = 30       # Numero de iteraciones como condicion de parada
 
     def generateObjectDict(self):
         """
@@ -163,13 +165,44 @@ class GeneticAlgorithm:
         platilloRight = []
         for i in range(len(solucion)):
             if solucion[i] == 0:
-                platilloLeft.append(self.dictObjetos[i])
+                platilloLeft.append(i)
             else:
-                platilloRight.append(self.dictObjetos[i])
+                platilloRight.append(i)
         return [platilloLeft, platilloRight]
 
     def GASolve(self):
+        """
+        Metodo principal del algoritmo
+        Lleva a cabo el procedimiento para la optimización
+        :return: None
+        """
+        pobActual = self.generarPoblacionInicial()
+        iteraciones = 0
 
+        while iteraciones < self.NUM_ITER and self.fitness(self.selectBest(pobActual)) != 0:
+            pobActual = self.newGen(pobActual)
+            iteraciones += 1
+
+        return self.selectBest(pobActual)
+
+    def tiempo_medio_ejecucion(self):
+        listaTiempos = []
+
+        for i in range(30):
+            tinicial = t.time()
+            self.GASolve()
+            tfinal = t.time() - tinicial
+            listaTiempos.append(tfinal)
+
+        media = np.mean(listaTiempos)
+        return media
+
+    def GASolveVisual(self):
+        """
+        Metodo principal del algoritmo
+        Lleva a cabo el procedimiento para la optimización de forma visual
+        :return: None
+        """
         pobActual = self.generarPoblacionInicial()
         iteraciones = 0
         print("Diccionario de objetos y pesos: ", self.dictObjetos)
@@ -191,5 +224,17 @@ class GeneticAlgorithm:
         print("Fitness:", self.fitness(best))
         print("Balanza: ", self.traducirSolucion(best))
 
-    def __init__(self):
+    def __init__(self, numObjetos=10, tamPob=10):
+        self.NUM_OBJETOS = numObjetos
+        self.TAM_POBLACION = tamPob
         self.dictObjetos = self.generateObjectDict()
+
+    def printProblemDetails(self):
+        print("\t\t\t\tProblema de la balanza. Algoritmo Genético. Parámetros")
+        print("Numero de objetos:", self.NUM_OBJETOS)
+        print("Rango de pesos", self.RANGO_PESOS)
+        print("Tamaño de poblacion:", self.TAM_POBLACION, "individuos")
+        print("Porcentaje de elitismo:", self.ELITE_PCT, "%")
+        print("Probabilidad de mutaciones:", self.MUTATION_PCT, "%")
+        print("Numero de iteraciones, Generaciones de individuos:", self.NUM_ITER)
+        print("Objetos:", self.dictObjetos)

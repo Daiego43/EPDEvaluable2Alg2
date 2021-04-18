@@ -1,8 +1,13 @@
 """
 Implementación de un algoritmo genetico
 """
-import GA as g
+import GA as ga
+
 
 if __name__ == "__main__":
-    ga = g.GeneticAlgorithm()
-    ga.GASolve()
+    g = ga.GeneticAlgorithm(10, 50)
+
+    g.printProblemDetails()
+    # print(g.tiempo_medio_ejecucion())
+
+
